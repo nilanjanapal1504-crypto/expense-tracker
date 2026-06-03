@@ -1,0 +1,1130 @@
+/*
+  ============================================================
+  EXPENSE TRACKER - style.css
+  ============================================================
+  CSS is the "skin" of your web app — it controls colors,
+  fonts, spacing, layout, animations, and responsiveness.
+
+  HOW CSS WORKS:
+  - A "selector" targets HTML elements (e.g., .card targets
+    any element with class="card")
+  - Inside {}, we write "property: value;" pairs
+  - Example: background: red; makes the background red
+
+  THIS FILE IS ORGANIZED INTO:
+  1. CSS Variables (our color/font palette)
+  2. Reset & Base Styles
+  3. Header
+  4. Summary Cards
+  5. Form Section
+  6. Chart Section
+  7. Monthly Summary
+  8. Transaction History
+  9. Modal & Toast
+  10. Dark Mode
+  11. Responsive (mobile)
+  12. Animations
+  ============================================================
+*/
+
+/* ============================================================
+   1. CSS VARIABLES
+   Variables let us define colors once and reuse everywhere.
+   If we want to change the primary color, we only change it HERE.
+   Syntax: --variable-name: value;
+   Usage: color: var(--variable-name);
+============================================================ */
+:root {
+  /* Brand colors */
+  --primary: #6c63ff;
+  --primary-light: #8b85ff;
+  --primary-dark: #4a42e8;
+
+  /* Semantic colors */
+  --income: #22c55e;
+  --income-bg: #f0fdf4;
+  --expense: #ef4444;
+  --expense-bg: #fef2f2;
+
+  /* Neutral palette */
+  --bg: #f0f2f8;
+  --surface: #ffffff;
+  --surface-2: #f8f9fc;
+  --border: #e2e8f0;
+  --text: #1e293b;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.07), 0 2px 6px rgba(0,0,0,0.05);
+  --shadow-lg: 0 10px 40px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.06);
+
+  /* Spacing */
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-xs: 6px;
+
+  /* Fonts */
+  --font-heading: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+
+  /* Transitions */
+  --transition: 0.2s ease;
+}
+
+/* ============================================================
+   2. RESET & BASE STYLES
+   Browsers have default styles that differ. We reset them
+   so our app looks the same everywhere.
+============================================================ */
+
+/* Box-sizing: makes width/height calculations predictable */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Base body styles */
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+}
+
+/* Remove default list styling */
+ul, ol { list-style: none; }
+
+/* Make images responsive by default */
+img { max-width: 100%; display: block; }
+
+/* Remove underline from links by default */
+a { text-decoration: none; color: inherit; }
+
+/* ============================================================
+   3. HEADER
+   The sticky top bar with logo and dark mode button.
+============================================================ */
+
+.app-header {
+  /* sticky: stays at top when you scroll */
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(10px);
+}
+
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Logo area (icon + title) */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-icon {
+  font-size: 28px;
+  /* Subtle animation on logo icon */
+  animation: float 3s ease-in-out infinite;
+}
+
+.logo-title {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--primary);
+  display: block;
+  letter-spacing: -0.5px;
+}
+
+.logo-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  display: block;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* Right side of header */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.current-date {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Dark mode toggle button */
+.dark-toggle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+}
+
+.dark-toggle:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  transform: rotate(20deg);
+}
+
+/* ============================================================
+   4. MAIN CONTENT LAYOUT
+============================================================ */
+
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Reusable card style — white box with shadow and rounded corners */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 28px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  transition: background var(--transition), border var(--transition);
+}
+
+/* ============================================================
+   5. SUMMARY CARDS (Balance, Income, Expense)
+============================================================ */
+
+.summary-cards {
+  display: grid;
+  /* 3 equal columns on large screens */
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.summary-cards .card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px 28px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.summary-cards .card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Decorative circle in the background of each card */
+.summary-cards .card::after {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  opacity: 0.07;
+  background: currentColor;
+}
+
+/* Icon inside each summary card */
+.card-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.balance-card .card-icon { background: #ede9ff; color: var(--primary); }
+.income-card .card-icon  { background: var(--income-bg); color: var(--income); }
+.expense-card .card-icon { background: var(--expense-bg); color: var(--expense); }
+
+.card-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  font-weight: 600;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.card-amount {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  display: block;
+  letter-spacing: -0.5px;
+  transition: color 0.3s;
+}
+
+/* Color helpers used throughout the app */
+.income-color  { color: var(--income) !important; }
+.expense-color { color: var(--expense) !important; }
+
+/* ============================================================
+   6. TWO COLUMN LAYOUT (Form + Chart)
+============================================================ */
+
+.two-col-layout {
+  display: grid;
+  /* Two unequal columns: form takes more space */
+  grid-template-columns: 1.2fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+/* ============================================================
+   7. SECTION TITLES (used in multiple sections)
+============================================================ */
+
+.section-title {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-title i {
+  color: var(--primary);
+  font-size: 16px;
+}
+
+/* ============================================================
+   8. ADD TRANSACTION FORM
+============================================================ */
+
+/* Income / Expense type tabs */
+.type-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 24px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 2px solid var(--border);
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 11px 16px;
+  border: none;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* The active tab: highlighted green (income) or red (expense) */
+#incomeTab.active  { background: var(--income); color: white; }
+#expenseTab.active { background: var(--expense); color: white; }
+
+.tab-btn:hover:not(.active) { background: var(--surface-2); }
+
+/* Form field groups */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* All input fields share this style */
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  outline: none;
+}
+
+/* When user clicks into a field (focus state) */
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.12);
+}
+
+/* Submit button */
+.submit-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  margin-top: 8px;
+  letter-spacing: 0.3px;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(108, 99, 255, 0.4);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+}
+
+/* ============================================================
+   9. CHART SECTION
+============================================================ */
+
+.chart-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-wrapper {
+  position: relative;
+  max-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Empty state when no expense data exists */
+.no-chart-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 0;
+  color: var(--text-light);
+  gap: 12px;
+}
+
+.no-chart-data i {
+  font-size: 48px;
+  opacity: 0.3;
+}
+
+.no-chart-data p {
+  font-size: 14px;
+}
+
+/* ============================================================
+   10. MONTHLY SUMMARY SECTION
+============================================================ */
+
+.monthly-section {
+  /* No extra styles needed — inherits .card */
+}
+
+.monthly-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.monthly-header .section-title {
+  margin-bottom: 0;
+}
+
+.monthly-header select {
+  padding: 8px 14px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.monthly-header select:focus {
+  border-color: var(--primary);
+}
+
+/* Grid of 4 stat boxes */
+.monthly-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+.monthly-stat {
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.mstat-label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.mstat-value {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  display: block;
+}
+
+/* Savings progress bar */
+.savings-bar-wrapper {
+  /* No extra styles needed */
+}
+
+.savings-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.savings-bar-track {
+  width: 100%;
+  height: 10px;
+  background: var(--income-bg);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.savings-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--income), var(--expense));
+  border-radius: 999px;
+  transition: width 0.6s ease;
+  width: 0%;
+}
+
+/* ============================================================
+   11. TRANSACTION HISTORY SECTION
+============================================================ */
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.history-header .section-title {
+  margin-bottom: 0;
+}
+
+/* CSV Export button */
+.export-btn {
+  padding: 9px 18px;
+  background: var(--surface-2);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all var(--transition);
+}
+
+.export-btn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* Filter bar — row of search + dropdowns */
+.filter-bar {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Search box with icon inside */
+.search-box {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface-2);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 9px 14px;
+  transition: border-color var(--transition);
+}
+
+.search-box:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.10);
+}
+
+.search-box i {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.search-box input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  width: 100%;
+}
+
+/* Filter dropdowns */
+.filter-bar select {
+  padding: 9px 14px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.filter-bar select:focus {
+  border-color: var(--primary);
+}
+
+/* Clear filters button */
+.clear-btn {
+  padding: 9px 14px;
+  background: var(--expense-bg);
+  border: 2px solid #fecaca;
+  border-radius: var(--radius-sm);
+  color: var(--expense);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all var(--transition);
+}
+
+.clear-btn:hover {
+  background: var(--expense);
+  color: white;
+  border-color: var(--expense);
+}
+
+/* Transaction count text */
+.transaction-count {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+/* ============================================================
+   12. INDIVIDUAL TRANSACTION ITEMS
+============================================================ */
+
+/* The list that holds all transaction items */
+.transaction-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Each transaction row */
+.tx-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+  /* Animation: items slide in from the left */
+  animation: slideIn 0.25s ease forwards;
+}
+
+.tx-item:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-sm);
+  transform: translateX(3px);
+}
+
+/* Category icon badge */
+.tx-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.tx-icon.income-icon  { background: var(--income-bg); }
+.tx-icon.expense-icon { background: var(--expense-bg); }
+
+/* Main info area */
+.tx-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.tx-desc {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tx-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.tx-category-badge {
+  display: inline-block;
+  background: var(--border);
+  color: var(--text-muted);
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  margin-right: 6px;
+  font-weight: 600;
+}
+
+/* Amount on the right side */
+.tx-amount {
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.tx-amount.income-amount  { color: var(--income); }
+.tx-amount.expense-amount { color: var(--expense); }
+
+/* Delete button */
+.tx-delete {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-light);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+
+.tx-delete:hover {
+  background: var(--expense-bg);
+  color: var(--expense);
+}
+
+/* Empty state (no transactions) */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px;
+  color: var(--text-light);
+  gap: 12px;
+}
+
+.empty-state i {
+  font-size: 48px;
+  opacity: 0.3;
+}
+
+/* ============================================================
+   13. DELETE CONFIRMATION MODAL
+============================================================ */
+
+/* Full-screen overlay that dims the background */
+.modal-overlay {
+  position: fixed;
+  inset: 0;  /* shorthand for top/right/bottom/left: 0 */
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+
+/* When modal is open, JavaScript adds the .active class */
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* The white box in the center */
+.modal-box {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 36px;
+  max-width: 380px;
+  width: 90%;
+  text-align: center;
+  transform: scale(0.9);
+  transition: transform 0.2s ease;
+  box-shadow: var(--shadow-lg);
+}
+
+.modal-overlay.active .modal-box {
+  transform: scale(1);
+}
+
+.modal-icon {
+  width: 64px;
+  height: 64px;
+  background: var(--expense-bg);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  font-size: 24px;
+  color: var(--expense);
+}
+
+.modal-box h3 {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.modal-box p {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 28px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.modal-cancel,
+.modal-confirm {
+  flex: 1;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.modal-cancel {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.modal-cancel:hover {
+  background: var(--border);
+}
+
+.modal-confirm {
+  background: var(--expense);
+  color: white;
+  border-color: var(--expense);
+}
+
+.modal-confirm:hover {
+  background: #dc2626;
+  border-color: #dc2626;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+/* ============================================================
+   14. TOAST NOTIFICATION
+============================================================ */
+
+.toast {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  background: var(--text);
+  color: white;
+  padding: 14px 22px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(120%);
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 1000;
+  max-width: 320px;
+}
+
+/* When JS adds .show class, the toast slides up */
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.toast.success { background: var(--income); }
+.toast.error   { background: var(--expense); }
+.toast.info    { background: var(--primary); }
+
+/* ============================================================
+   15. DARK MODE
+   When <body> has the class "dark", all these styles override
+   the default light mode styles above.
+============================================================ */
+
+body.dark {
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --surface-2: #21253a;
+  --border: #2e3349;
+  --text: #e8eaf0;
+  --text-muted: #8892b0;
+  --text-light: #4a5568;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.35);
+  --shadow-lg: 0 10px 40px rgba(0,0,0,0.5);
+  --income-bg: rgba(34, 197, 94, 0.1);
+  --expense-bg: rgba(239, 68, 68, 0.1);
+}
+
+/* In dark mode, the dark toggle shows a sun icon */
+body.dark .dark-toggle {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* ============================================================
+   16. ANIMATIONS
+   @keyframes define named animation sequences.
+   Elements use them with animation: name duration easing;
+============================================================ */
+
+/* Slide in from left — used for transaction items */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Float up and down — used for logo icon */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
+}
+
+/* Pulse — used for amount when updated */
+@keyframes pulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.amount-updated {
+  animation: pulse 0.4s ease;
+}
+
+/* ============================================================
+   17. RESPONSIVE DESIGN (Mobile-Friendly)
+   @media queries apply different styles at different screen sizes.
+   "max-width: 768px" means: on screens 768px wide or smaller
+   (tablets and phones), apply these styles.
+============================================================ */
+
+@media (max-width: 900px) {
+  /* Stack the two-column layout into one column */
+  .two-col-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Smaller header padding */
+  .header-inner {
+    padding: 0 16px;
+  }
+
+  /* Stack summary cards into one column */
+  .summary-cards {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .main-content {
+    padding: 20px 16px 40px;
+    gap: 16px;
+  }
+
+  .card {
+    padding: 20px 18px;
+  }
+
+  /* Stack monthly stats into 2 columns instead of 4 */
+  .monthly-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Stack filter bar */
+  .filter-bar {
+    flex-direction: column;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .filter-bar select {
+    width: 100%;
+  }
+
+  .clear-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Toast at bottom center on mobile */
+  .toast {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    text-align: center;
+  }
+
+  /* Hide date in header on small screens */
+  .current-date {
+    display: none;
+  }
+
+  /* Smaller amount font on cards */
+  .card-amount {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-sub {
+    display: none;
+  }
+
+  .history-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .export-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

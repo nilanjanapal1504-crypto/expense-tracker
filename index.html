@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  EXPENSE TRACKER - index.html
+  ============================================================
+  This is the STRUCTURE of our web app.
+  Think of HTML as the skeleton of a body — it defines
+  what elements exist on the page (cards, buttons, forms, etc.)
+  but doesn't control how they look (that's CSS) or
+  how they behave (that's JavaScript).
+  ============================================================
+-->
+<html lang="en">
+
+<head>
+  <!-- meta charset: tells the browser to support all characters (emojis, Indian scripts, etc.) -->
+  <meta charset="UTF-8" />
+
+  <!-- viewport: makes the site look good on mobile phones -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- The title shown in the browser tab -->
+  <title>Expense Tracker</title>
+
+  <!-- Google Fonts: we load two beautiful fonts from the internet -->
+  <!-- "Syne" is used for headings, "DM Sans" for body text -->
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome: a library of icons (trash icon, search icon, etc.) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Chart.js: a library that draws beautiful charts (our pie chart) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- Our own CSS file — all visual styling lives here -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <!-- ============================================================
+       APP HEADER
+       This is the top bar of the application.
+       It contains the app name/logo and the dark mode toggle.
+  ============================================================ -->
+  <header class="app-header">
+    <div class="header-inner">
+      <!-- App logo + name -->
+      <div class="logo">
+        <span class="logo-icon">💰</span>
+        <div>
+          <span class="logo-title">SpendWise</span>
+          <span class="logo-sub">Personal Finance Tracker</span>
+        </div>
+      </div>
+
+      <!-- Right side: dark mode toggle + current date display -->
+      <div class="header-right">
+        <span class="current-date" id="currentDate"></span>
+
+        <!-- Dark Mode Toggle Button -->
+        <!-- When clicked, JavaScript will add/remove the "dark" class on <body> -->
+        <button class="dark-toggle" id="darkToggle" title="Toggle Dark Mode">
+          <i class="fas fa-moon" id="darkIcon"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       MAIN CONTENT WRAPPER
+       Everything visible below the header goes inside this <main>
+  ============================================================ -->
+  <main class="main-content">
+
+    <!-- ============================================================
+         DASHBOARD SUMMARY CARDS
+         These three cards show: Balance, Total Income, Total Expense
+         The numbers inside them are updated by JavaScript.
+    ============================================================ -->
+    <section class="summary-cards">
+
+      <!-- Card 1: Current Balance -->
+      <div class="card balance-card">
+        <div class="card-icon"><i class="fas fa-wallet"></i></div>
+        <div class="card-info">
+          <span class="card-label">Current Balance</span>
+          <!-- id="balance" lets JavaScript find and update this number -->
+          <span class="card-amount" id="balance">₹0.00</span>
+        </div>
+      </div>
+
+      <!-- Card 2: Total Income -->
+      <div class="card income-card">
+        <div class="card-icon"><i class="fas fa-arrow-trend-up"></i></div>
+        <div class="card-info">
+          <span class="card-label">Total Income</span>
+          <span class="card-amount income-color" id="totalIncome">₹0.00</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Total Expense -->
+      <div class="card expense-card">
+        <div class="card-icon"><i class="fas fa-arrow-trend-down"></i></div>
+        <div class="card-info">
+          <span class="card-label">Total Expenses</span>
+          <span class="card-amount expense-color" id="totalExpense">₹0.00</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============================================================
+         TWO-COLUMN LAYOUT
+         Left column: Add Transaction Form
+         Right column: Pie Chart
+    ============================================================ -->
+    <div class="two-col-layout">
+
+      <!-- ============================================================
+           ADD TRANSACTION FORM
+           The user fills this form to add income or expense.
+           On submit, JavaScript reads the values and saves to Local Storage.
+      ============================================================ -->
+      <section class="form-section card">
+        <h2 class="section-title"><i class="fas fa-plus-circle"></i> Add Transaction</h2>
+
+        <!-- Transaction Type Tabs: Income / Expense -->
+        <div class="type-tabs">
+          <!-- When user clicks "Income", the tab becomes active via JavaScript -->
+          <button class="tab-btn active" id="incomeTab" onclick="setType('income')">
+            <i class="fas fa-plus"></i> Income
+          </button>
+          <button class="tab-btn" id="expenseTab" onclick="setType('expense')">
+            <i class="fas fa-minus"></i> Expense
+          </button>
+        </div>
+
+        <!-- The actual form fields -->
+        <!-- "onsubmit" means: when user clicks Submit, run addTransaction() in JS -->
+        <form id="transactionForm" onsubmit="addTransaction(event)">
+
+          <!-- Amount Field -->
+          <div class="form-group">
+            <label for="amount">Amount (₹)</label>
+            <input type="number" id="amount" placeholder="e.g. 500" min="0.01" step="0.01" required />
+          </div>
+
+          <!-- Category Dropdown -->
+          <!-- This dropdown changes based on whether Income or Expense is selected -->
+          <div class="form-group">
+            <label for="category">Category</label>
+            <select id="category" required>
+              <!-- Options are filled by JavaScript depending on type -->
+            </select>
+          </div>
+
+          <!-- Description Field -->
+          <div class="form-group">
+            <label for="description">Description</label>
+            <input type="text" id="description" placeholder="e.g. Dinner at restaurant" required />
+          </div>
+
+          <!-- Date Field -->
+          <div class="form-group">
+            <label for="date">Date</label>
+            <input type="date" id="date" required />
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="submit-btn" id="submitBtn">
+            <i class="fas fa-plus"></i> Add Transaction
+          </button>
+        </form>
+      </section>
+
+      <!-- ============================================================
+           PIE CHART SECTION
+           Chart.js will draw a colorful pie chart here showing
+           how expenses are distributed across categories.
+      ============================================================ -->
+      <section class="chart-section card">
+        <h2 class="section-title"><i class="fas fa-chart-pie"></i> Spending by Category</h2>
+
+        <!-- The canvas element is where Chart.js draws the chart -->
+        <!-- Think of it as a blank drawing board -->
+        <div class="chart-wrapper">
+          <canvas id="expenseChart"></canvas>
+        </div>
+
+        <!-- Shown when there's no expense data yet -->
+        <div class="no-chart-data" id="noChartData">
+          <i class="fas fa-chart-pie"></i>
+          <p>Add expenses to see your spending chart</p>
+        </div>
+      </section>
+
+    </div><!-- end two-col-layout -->
+
+    <!-- ============================================================
+         MONTHLY SUMMARY SECTION
+         Shows income, expenses, and savings for a selected month.
+    ============================================================ -->
+    <section class="monthly-section card">
+      <div class="monthly-header">
+        <h2 class="section-title"><i class="fas fa-calendar-alt"></i> Monthly Summary</h2>
+        <!-- Dropdown to pick which month to summarize -->
+        <select id="monthFilter" onchange="updateMonthlySummary()">
+          <!-- Options filled by JavaScript -->
+        </select>
+      </div>
+
+      <div class="monthly-stats">
+        <div class="monthly-stat">
+          <span class="mstat-label">Income</span>
+          <span class="mstat-value income-color" id="monthIncome">₹0.00</span>
+        </div>
+        <div class="monthly-stat">
+          <span class="mstat-label">Expenses</span>
+          <span class="mstat-value expense-color" id="monthExpense">₹0.00</span>
+        </div>
+        <div class="monthly-stat">
+          <span class="mstat-label">Net Savings</span>
+          <span class="mstat-value" id="monthSavings">₹0.00</span>
+        </div>
+        <div class="monthly-stat">
+          <span class="mstat-label">Transactions</span>
+          <span class="mstat-value" id="monthCount">0</span>
+        </div>
+      </div>
+
+      <!-- Progress bar showing expense vs income ratio -->
+      <div class="savings-bar-wrapper">
+        <div class="savings-bar-label">
+          <span>Expense Ratio</span>
+          <span id="savingsPercent">0%</span>
+        </div>
+        <div class="savings-bar-track">
+          <div class="savings-bar-fill" id="savingsBarFill"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         TRANSACTION HISTORY SECTION
+         Shows all transactions with search, filter, and delete.
+    ============================================================ -->
+    <section class="history-section card">
+
+      <!-- Section header with title and CSV export button -->
+      <div class="history-header">
+        <h2 class="section-title"><i class="fas fa-list"></i> Transaction History</h2>
+        <button class="export-btn" onclick="exportToCSV()">
+          <i class="fas fa-download"></i> Export CSV
+        </button>
+      </div>
+
+      <!-- Search and Filter Controls -->
+      <div class="filter-bar">
+
+        <!-- Search Box: filters by description text -->
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="searchInput" placeholder="Search transactions..." oninput="filterTransactions()" />
+        </div>
+
+        <!-- Filter by type: All / Income / Expense -->
+        <select id="filterType" onchange="filterTransactions()">
+          <option value="all">All Types</option>
+          <option value="income">Income Only</option>
+          <option value="expense">Expense Only</option>
+        </select>
+
+        <!-- Filter by category -->
+        <select id="filterCategory" onchange="filterTransactions()">
+          <option value="all">All Categories</option>
+        </select>
+
+        <!-- Filter by month -->
+        <select id="filterMonth" onchange="filterTransactions()">
+          <option value="all">All Months</option>
+        </select>
+
+        <!-- Clear all filters -->
+        <button class="clear-btn" onclick="clearFilters()">
+          <i class="fas fa-times"></i> Clear
+        </button>
+      </div>
+
+      <!-- Transaction count display -->
+      <div class="transaction-count">
+        Showing <span id="txCount">0</span> transaction(s)
+      </div>
+
+      <!-- The list of transactions — populated by JavaScript -->
+      <div class="transaction-list" id="transactionList">
+        <!-- Empty state message shown when no transactions exist -->
+        <div class="empty-state" id="emptyState">
+          <i class="fas fa-receipt"></i>
+          <p>No transactions yet. Add your first one above!</p>
+        </div>
+      </div>
+
+    </section>
+
+  </main><!-- end main-content -->
+
+  <!-- ============================================================
+       DELETE CONFIRMATION MODAL
+       A popup that asks "Are you sure?" before deleting.
+       Hidden by default (display:none in CSS).
+  ============================================================ -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-box">
+      <div class="modal-icon"><i class="fas fa-trash-alt"></i></div>
+      <h3>Delete Transaction?</h3>
+      <p>This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+        <button class="modal-confirm" onclick="confirmDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       TOAST NOTIFICATION
+       A small message that appears briefly at the bottom.
+       E.g., "Transaction added!" or "Transaction deleted!"
+  ============================================================ -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ============================================================
+       OUR JAVASCRIPT FILE
+       Always load JS at the END of body — so the HTML is fully
+       loaded before JS tries to find elements on the page.
+  ============================================================ -->
+  <script src="script.js"></script>
+
+</body>
+</html>
